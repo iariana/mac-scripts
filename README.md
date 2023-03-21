@@ -8,4 +8,4 @@ My goal is to be able to share my "simple" scripts and maybe even help further. 
 I would also like to add that this was not perfectly solved, but it works for the requirements.
 
 # The motto is here: Never ruin your running system. 
-Therefore, I am also open to suggestions for improvement or information that enrich my knowledge and allow me to develop further.
+Therefore, I am also open for suggestions or information that enrich my knowledge and allow me to develop further.
