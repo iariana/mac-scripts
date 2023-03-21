@@ -3,7 +3,7 @@ macOS-Automation-Scripts
 
 I am currently in my second training as an IT systems technician. 
 During that time, I have come into contact with various projects, which has also allowed me to create and implement script automations. 
-My goal is to be able to share my "simple" scripts and maybe even help further. Since I know how time-consuming something like this can be :)
+My goal is to be able to share my "simple" scripts and maybe even help further. Since I know how time-consuming it can be to create a script :)
 
 I would also like to add that this was not perfectly solved, but it works for the requirements
 
