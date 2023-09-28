@@ -1,0 +1,29 @@
+#!/bin/zsh
+#############################################
+# Last change: 2022-12-08 Ariana
+# This Script installs the latest version of ClamXAV
+# Source: script used from googlechromeinstaller.sh https://community.jamf.com/t5/jamf-pro/google-chrome-script-for-installing-either-intel-or-m1-apple/td-p/250409
+#############################################
+
+# Create temp folder for download
+mkdir "/tmp/clamxav"
+
+# Change working directory
+cd "/tmp/clamxav"
+
+# Download ClamXAV
+curl -L -o "/tmp/clamxav/ClamXav_Current.pkg" "https://www.clamxav.com/downloads/ClamXav_Current.pkg"
+
+# Run installation as administrator. No need to write password in terminal
+echo 1234 | sudo -S Command
+
+# Install ClamXAV
+sudo /usr/sbin/installer -pkg ClamXav_Current.pkg -target /
+
+# Remove no longer needed files
+# -rf: -r indicates recursive removal and helps remove non-empty directories. -f The option allows removal without confirmation, even if a file does not exist.
+sudo rm -rf "/tmp/clamxav"
+
+# xattr: Display and manipulate extended attributes of one or more files, including directories and symbolic links.
+# If all of the necessary operations complete successfully, the file exits with a zero return code that allows the init command to start loggers to complete normal initialization and startup.
+sudo xattr -rc "/Applications/ClamXAV.app"
