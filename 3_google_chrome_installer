@@ -1,0 +1,38 @@
+#!/bin/zsh
+#############################################
+# Last change: 2022-12-06 Ariana Idrizaj
+# Run Installer with a stable URL
+# source https://community.jamf.com/t5/jamf-pro/google-chrome-script-for-installing-either-intel-or-m1-apple/td-p/250409
+#############################################
+
+# Make temp folder for downloads
+mkdir "/tmp/googlechrome"
+
+# Change working directory
+cd "/tmp/googlechrome"
+
+# Download Google Chrome with a stable URL and accepting Google Chrome terms of service.
+# curl: Allows to transfer files from or to a server without user interaction.
+# -L: Forwarding (only) HTTP/HTTPS
+# -o Writes the contents of the downloaded file to the specified FILE instead of standard output
+curl -L -o "/tmp/googlechrome/googlechrome.pkg" "https://dl.google.com/chrome/mac/stable/accept_tos%3Dhttps%253A%252F%252Fwww.google.com%252Fintl%252Fen_ph%252Fchrome%252Fterms%252F%26_and_accept_tos%3Dhttps%253A%252F%252Fpolicies.google.com%252Fterms/googlechrome.pkg"
+
+# Run installation as administrator. No need to write password in terminal
+# source https://stackoverflow.com/questions/25215604/use-sudo-without-password-inside-a-script
+#echo 1234 | sudo -S Command
+
+# Install Google Chrome
+sudo /usr/sbin/installer -pkg googlechrome.pkg -target /
+
+# Remove no longer needed files
+# -rf: -r indicates recursive removal and helps remove non-empty directories. -f The option allows removal without confirmation, even if a file does not exist.
+sudo rm -rf "/tmp/googlechrome"
+
+# xattr: Display and manipulate extended attributes of one or more files, including directories and symbolic links.
+# If all of the necessary operations complete successfully, the file exits with a zero return code that allows the init command to start loggers to complete normal initialization and startup.
+sudo xattr -rc "/Applications/Google Chrome.app"
+
+
+# Set Google Chrome as default browser
+# source https://www.felixparadis.com/posts/how-to-set-the-default-browser-from-the-command-line-on-a-mac/
+open -a "Google Chrome" --args --make-default-browser
