@@ -1,0 +1,14 @@
+# Last Change 2022-12-08
+# Please, type in your account informations
+#################################################
+# ATTENTION! 
+#################################################
+# 1. Don't delete the " "
+# 2. There should not be any space around the “=” sign in the variable assignment
+# 3. Write a password with min. 4 letters or numbers
+# 4. If you need a password hint, just copy variable PASSWORDHINT="" and write into the two ""
+#################################################
+
+FIRSTNAME="test"
+SURNAME="-test"
+PASSWORD="test1234"
