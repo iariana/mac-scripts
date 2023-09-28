@@ -1,0 +1,25 @@
+This is an order of how everything should work in the production environment. 
+
+As already mentioned, the tool iMazing was used.
+
+It was thought that a user and admin account would be created.
+
+**************************************************************************************
+
+The procedure to install everything in the correct order
+
+1. Plug in the stick and go to "Your-Name" directory
+2. Double klick the first scrip
+3. Now a new Finder site opens
+4. Start installing all profiles (1.2.4.5)
+5. Go back to Volume
+6. Double klick number 3. 
+7. Double klick number 4.
+8. Fill in all user information in textfile number 5.
+9. Double klick number 6.
+
+
+If everything is done, login to the new created user to create automatically its new home directory
+After that, open Finder -> Macintosh HD -> Users -> Shared -> "Your-Name" -> user
+
+Install the profile (Read 2_install_profiles.txt)
