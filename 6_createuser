@@ -1,0 +1,110 @@
+#!/bin/sh
+#############################################
+# Last change: 2022-12-09 Ariana
+# This script creates an useraccount
+#############################################
+
+# Variable for path where textfile is located
+path="/Volumes/KINGSTON/"Your-Name"/5_user_information.txt"
+
+# From which file do we get the informations
+# Check man page on terminal for more information
+# Or https://www.geeksforgeeks.org/source-command-in-linux-with-examples/
+source $path
+
+# Variables created in textfile "5_user_information.txt"
+accountname="$FIRSTNAME$SURNAME"
+fullname="$FIRSTNAME"\ "$SURNAME"
+pw="$PASSWORD"
+#pwh="$PASSWORDHINT"
+
+#################Test NULL####################
+# if/fi: Statement allows Shell to make decisions and execute them conditionally
+# Testing if variables are empty in textfile "5_user_information.txt"
+null() {
+if [[ -z "$FIRSTNAME" ]]; then 
+	echo "FIRSTNAME is empty! Please check textfile"
+	exit
+fi
+if [[ -z "$SURNAME" ]]; then
+	echo "SURNAME is empty! Please check textfile"
+	exit
+fi
+if [[ -z "$PASSWORD" ]]; then 
+	echo "PASSWORD is empty! Please check textfile"
+	exit
+fi
+}
+###############################################
+
+# Convert special characters and diacritics
+accountname=$(echo "$accountname" | iconv -t ascii//TRANSLIT | sed -r "s/[\ \"\'\^\`\´\-]+//g" | tr '[A-Z]' '[a-z]') 
+echo $accountname
+
+# Test command to check the output from converted variables
+echo "$accountname"
+echo "$fullname"
+echo "$pw"
+
+###########Start of if statement##############
+# Asks the user if his entered user informations in "5_user_information.txt" are correct
+# https://stackoverflow.com/questions/226703/how-do-i-prompt-for-yes-no-cancel-input-in-a-linux-shell-script
+read -p "Are your informations correct? (y/n) : " answer;
+
+# If user types y (Yes) in terminal it continues the script
+# If user types n (No) in terminal it stops automatically the script with *fi (Is set at the end of the script)
+if [ "$answer" == "y" ]; then
+
+# Create a new user (username) with string operation from "5_user_information.txt"
+# dscl: Explanation; Directory Service command line utility. Create, read, and manage Directory Service data (man page)
+# . : The dot command (.), aka full stop or period, is a command used to evaluate commands in the current execution context (https://www.shell-tips.com/bash/source-dot-command/gsc.tab=0)
+sudo dscl . -create /Users/"$accountname"
+
+# Add the display name of the user from "5_user_information.txt"
+sudo dscl . -create /Users/"$accountname" RealName "$fullname"
+
+# Adds the written password in textfile "5_user_information.txt"
+sudo dscl . -passwd /Users/"$accountname" $pw
+
+# (Optional)Add a password hint   
+#sudo dscl . -create /Users/"$accountname" hint "$pwh"
+
+# (Optional)Add a profile picture   
+#sudo dscl . -create /Users/"$accountname"  picture “/path to picture.png”  
+
+############Creating UID & GID##################
+# First it lists all user UID's. After that it reads the max user ID
+# awk: Is a domain-specific language designed for text processing and typically used as a data extraction and reporting tool (https://en.wikipedia.org/wiki/AWK)
+MAXUID=`dscl . list /Users UniqueID | awk '$2>m{m=$2}END{print m}'`
+
+# After variable MAXUID got the new value of max ID it calculates +1
+NEXTUID=$(( $MAXUID + 1 ))
+
+# Retrieve specific User ID for creating new user (Variablename UID1, because UID is a readonly variable)
+# awk prints the formatted output (new UID)
+UID1=`dscl . list /Users/$accountname | awk '{print $2}'`
+
+# Retrieve Specific Group ID for new user (i.e. staff)
+# awk prints the formatted output (new UID)
+# read: Is a bash built-in command that reads a line from the standard input (https://linuxize.com/post/bash-read/)
+STAFFGID=`dscl . read /Groups/staff PrimaryGroupID | awk '{print $2}'`
+################################################
+
+# Finally setting Unique ID for New user
+sudo dscl . -create /Users/"$accountname" UniqueID $NEXTUID
+
+# Set the group ID for the user with retrieved specific group staff ID  
+sudo dscl . -create /Users/"$accountname" PrimaryGroupID $STAFFGID
+
+# Login shell  
+sudo dscl . -create /Users/"$accountname" UserShell /bin/zsh  
+
+# Create a Home folder for the user  
+sudo dscl . -create /Users/"$accountname" NFSHomeDirectory /Users/"$accountname"
+
+# Append the User with admin privilege. If this line is not included the user will be set as standard user
+# sudo dscl . -append /Groups/admin GroupMembership "$accountname"
+
+############End of if statement#################
+# * it stops automatically the script with fi, if answer is No (n)
+fi
