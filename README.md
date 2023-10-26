@@ -1,7 +1,7 @@
 # mac-scripts
 macOS-Automation-Scripts
 
-This year 2023, I have successfully completed my secondary education as a computer scientist specializing in systems engineering in the summer. :)
+This year 2023, I have successfully completed my secondary education as a computer scientist specializing in systems engineering. :)
 
 During my internship, I wrote automation scripts for macOS. 
 My goal is to be able to share my "simple" scripts and maybe even help further. Since I know how time-consuming it can be to create a script.
@@ -45,5 +45,5 @@ Possibilities:
 - Home directory cleanly created
 - Group membership can be configured
 
-This script definitely has room for improvement, but it works fine. :)
+This script definitely has room for improvement, but it works fine.
   
