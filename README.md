@@ -10,7 +10,7 @@ Perhaps these also serve as auxiliary material to be developed even better.
 I would also like to add that this was not perfectly solved, but it works for the requirements I needed to that time.
 
 ## Good to know
-These scripts were tested on Apple Silicon with an M1 processor and an Intel processor.
+These scripts were tested on Apple Silicon processor and Intel processor.
 
 ## Never change your running system
 Therefore, I am also open for suggestions or information that enrich my knowledge and allow me to develop further.
