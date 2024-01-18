@@ -1,50 +1,32 @@
-#!/bin/bash
+#!/bin/zsh
 #############################################
-# Last change: 2022-12-07 Ariana
-# This script creates directories, to copy files from (source) Volume to this (destination) device
+# Last change: 2024-01-17 Ariana
+# This script creates directories and copies files from the source to the destination
 # It's also possible to overwrite the existing file if those are changed 
 #############################################
 
-# Variables for source path's 
-# sa = Source-Admin
-# su = Source-User
-sa="/Volumes/"USB-Name"/"Your-Name"/system_profiles/admin"
-su="/Volumes/"USB-Name"/"Your-Name"/system_profiles/user"
+# Paths to source directories
+sa="/Volumes/DONE-Installer/done-settings/system_profiles/admin"
+su="/Volumes/DONE-Installer/done-settings/system_profiles/user"
 
-# Variables for destination path's
-# pa = Path-Admin
-# pu = Path-User
-pa="/Users/Shared/"Your-Name"/"
-pu="/Users/Shared/"Your-Name"/"
+# Paths to existing destination directories
+pa="/Users/Shared/done-settings/"
+pu="/Users/Shared/done-settings/"
 
-
-# Change current working directory to source path: /Volumes/Data/"Your-Name"/system_profiles/admin
-cd $sa
-
-# if-fi statement: The Commands inside if(true) and fi(finish) get executed if the condition evaluates to TRUE
-# ! = not // -e = exists (Variable $path4 /Users/Shared/"Your-Name"/), then 
-# mkdir = create(makedirectory) -p = no error if present; create parent directories if necessary
-if [[ ! -e $pa ]]; then
-	mkdir -p /Users/Shared/"Your-Name"/admin
+# Check if source directories exist
+if [[ ! -e "$sa" || ! -e "$su" ]]; then
+    echo "Source directories do not exist."
+    exit 1
 fi
 
-# cp: Copy files from source path: /Volumes/Data/"Your-Name"/system_profiles/admin to destination path: /Users/Shared/"Your-Name"/admin
-# -R: To indicate the recursive(included subdirectories) copying of directories
-cp -R $sa $pa
+# Check if destination directories exist, create them if not
+[[ -d "$pa" ]] || mkdir -p "$pa"
+[[ -d "$pu" ]] || mkdir -p "$pu"
 
-# Change current working directory to source path: /Volumes/Data/"Your-Name"/system_profiles/user
-cd $su
+# Copy files from source to destination
+# -R: To indicate recursive (including subdirectories) copying of directories
+cp -R "$sa" "$pa"
+cp -R "$su" "$pu"
 
-# if-fi statement: The Commands inside if(true) and fi(finish) get executed if the condition evaluates to TRUE 
-# ! = not // -e = exists (Variable $path4 /Users/Shared/"Your-Name"/), then 
-# mkdir = create(makedirectory) -p = no error if present; create parent directories if necessary
-if [[ ! -e $pu ]]; then
-	mkdir -p /Users/Shared/"Your-Name"/user
-fi
-
-# cp: Copy files from source path: /Volumes/Data/"Your-Name"/system_profiles/user to destination path: /Users/Shared/"Your-Name"/user
-# -R: To indicate the recursive(included subdirectories) copying of directories
-cp -R $su $pu
-
-# Opens Finder after all's done
-open /Users/Shared/"Your-Name"/
+# Open the Finder when done
+open "$pa"
