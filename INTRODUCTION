@@ -8,7 +8,7 @@ It was thought that a user and admin account would be created.
 
 The procedure to install everything in the correct order
 
-1. Plug in the stick and go to "Your-Name" directory
+1. Plug in your usb stick and go to your directory / or use the script 1_copy_directories_dynamic_path
 2. Double klick the first scrip
 3. Now a new Finder site opens
 4. Start installing all profiles (1.2.4.5)
