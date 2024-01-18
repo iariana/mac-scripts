@@ -6,12 +6,12 @@
 #############################################
 
 # Paths to source directories
-sa="/Volumes/DONE-Installer/done-settings/system_profiles/admin"
-su="/Volumes/DONE-Installer/done-settings/system_profiles/user"
+sa="/Volumes/'USB-NAME'/'DIRECTORY'/system_profiles/admin"
+su="/Volumes/'USB-NAME'/'DIRECTORY'/system_profiles/user"
 
 # Paths to existing destination directories
-pa="/Users/Shared/done-settings/"
-pu="/Users/Shared/done-settings/"
+pa="/Users/Shared/'DIRECTORY'/"
+pu="/Users/Shared/'DIRECTORY'/"
 
 # Check if source directories exist
 if [[ ! -e "$sa" || ! -e "$su" ]]; then
