@@ -1,9 +1,12 @@
 #!/bin/zsh
 #############################################
-# Last change: 2024-01-17 Ariana
-# This script facilitates the creation of a user account by automating several steps
-# It ensures that the provided user information is correct and follows the required conventions
+# Last change: 2024-04-24 Ariana
+# This script facilitates the creation of a user account and changes the hostname by automating several steps
 #############################################
+
+# Define variables
+user_data_file="$(dirname "$0")/resources/user_data.txt"
+source "$user_data_file"
 
 # Function to check if a variable is empty
 # Usage: check_empty <variable> <variable_name_in_error_message>
@@ -13,9 +16,7 @@
 # $2: The second argument passed to the function (variable name for error message)
 check_empty() {
     if [ -z "$1" ]; then 
-        # Display an error message and exit if the variable is empty
         echo "$2 is empty! Please check the textfile"
-        # exit 1: Exit the script with a non-zero status code (1) indicating an error
         exit 1
     fi
 }
@@ -29,10 +30,9 @@ check_empty() {
 # | tr '[:upper:]' '[:lower:]': Convert the result to lowercase
 convert_accountname() {
     # Capture the converted name in a local variable
-    local converted_name=$(echo "$1" | iconv -t ascii//TRANSLIT | sed -r "s/[\ \"\'\^\`\´]+//g" | tr -d '[:space:]' | tr ' ' '-')
-    
-    # Print the converted name in lowercase
-    echo "$converted_name" | tr '[:upper:]' '[:lower:]'
+    local converted_name=$(echo "$1" | /usr/bin/iconv -t ascii//TRANSLIT | /usr/bin/sed -r "s/[\ \"\'\^\`\´]+//g" | /usr/bin/tr -d '[:space:]' | /usr/bin/tr ' ' '-')
+	# Print the converted name in lowercase
+    echo "$converted_name" | /usr/bin/tr '[:upper:]' '[:lower:]'
 }
 
 # Function to convert/replace special characters and diacritics for the full name
@@ -41,88 +41,84 @@ convert_accountname() {
 # tr -d '[:space:]': Remove any remaining spaces
 # tr ' ' '-': Replace spaces with hyphens
 convert_fullname() {
-    # Remove special characters and spaces, replace spaces with hyphens
-    echo "$1" | sed 's/[\ \"'"'"'\^\`\´]+//g' | tr -d '[:space:]' | tr ' ' '-'
+	# Remove special characters and spaces, replace spaces with hyphens
+    echo "$1" | /usr/bin/sed 's/[\ \"'"'"'\^\`\´]+//g' | /usr/bin/tr -d '[:space:]' | /usr/bin/tr ' ' '-'
 }
 
-# Function to create a new user
-privileges to create new directory entries.
+# Create variables
+accountname=$(convert_accountname "${FIRSTNAME:0:1}${SURNAME}")
+fullname=$(convert_fullname "$FIRSTNAME $SURNAME")
+pw="$PASSWORD"
+passwordhint="$PASSWORDHINT"
+hostname="DONE-$HOSTNAME"
 
+# Check if variables for user and hostname are empty
+check_empty "$FIRSTNAME" "FIRSTNAME"
+check_empty "$SURNAME" "SURNAME"
+check_empty "$PASSWORD" "PASSWORD"
+check_empty "$PASSWORDHINT" "PASSWORDHINT"
+check_empty "$HOSTNAME" "HOSTNAME"
+
+# Define functions
+# Function to create a new user
 create_user() {
     # Create a new user (username) with string operation from "5_user_information.txt"
     # The command `dscl` is a Directory Service command line utility used to manipulate Directory Service data.
     # The option `-create` is used to create a new directory entry in the specified directory node.
     # Here, we are creating a new user entry under /Users/ directory with the specified username.
-    sudo dscl . -create /Users/"$accountname"
-    sudo dscl . -create /Users/"$accountname" RealName "$fullname"
-    sudo dscl . -passwd /Users/"$accountname" "$pw"
+    sudo_cmd="/usr/bin/sudo"
+    dscl_cmd="/usr/bin/dscl"
 
-    # (Optional) Add a password hint   
-    # sudo dscl . -create /Users/"$accountname" hint "$pwh"
-
-    # (Optional) Add a profile picture   
-    # sudo dscl . -create /Users/"$accountname" picture “/path to picture.png”  
+    $sudo_cmd $dscl_cmd . -create /Users/"$accountname"
+    $sudo_cmd $dscl_cmd . -create /Users/"$accountname" RealName "$fullname"
+    $sudo_cmd $dscl_cmd . -passwd /Users/"$accountname" "$pw"
 
     # Creating UID & GID
-    # `"$0"` represents the path of the script itself.
-    # `dirname` is a command that extracts the directory component of a file's path.
-    path1="$(dirname "$0")/noneedtostart.sh"
-    source "$path1"
+    MAXUID=$($sudo_cmd $dscl_cmd . list /Users UniqueID | $sudo_cmd /usr/bin/awk '$2>m{m=$2}END{print m}')
+    NEXTUID=$((MAXUID + 1))
+    STAFFGID=$($sudo_cmd $dscl_cmd . read /Groups/staff PrimaryGroupID | $sudo_cmd /usr/bin/awk '{print $2}')
 
-    # Finally setting Unique ID for New user
-    sudo dscl . -create /Users/"$accountname" UniqueID $NEXTUID
+    $sudo_cmd $dscl_cmd . -create /Users/"$accountname" UniqueID $NEXTUID
+    $sudo_cmd $dscl_cmd . -create /Users/"$accountname" PrimaryGroupID $STAFFGID
+    $sudo_cmd $dscl_cmd . -create /Users/"$accountname" UserShell /bin/zsh  
+    #$sudo_cmd $dscl_cmd . -create /Users/"$accountname" NFSHomeDirectory /Users/"$accountname"
 
-    # Set the group ID for the user with retrieved specific group staff ID  
-    sudo dscl . -create /Users/"$accountname" PrimaryGroupID $STAFFGID
-
-    # Login shell  
-    sudo dscl . -create /Users/"$accountname" UserShell /bin/zsh  
-
-    # Create a Home folder for the user  
-    sudo dscl . -create /Users/"$accountname" NFSHomeDirectory /Users/"$accountname"
-
-    # Append the User with admin privilege. If this line is not included the user will be set as standard user
-    # sudo dscl . -append /Groups/admin GroupMembership "$accountname"
+    # Set the user's short name (username) to the accountname
+    $sudo_cmd $dscl_cmd . -create /Users/"$accountname" RecordName "$accountname"
 
     echo "User created successfully"
 }
 
-# Variable for path where textfile is located
-# The expression "$(dirname "$0")" is used to retrieve the directory of the currently executing script.
-# `"$0"` represents the path of the script itself.
-# `dirname` is a command that extracts the directory component of a file's path.
-# The overall expression returns the directory containing the script.
-path="$(dirname "$0")/5_user_information.txt"
+# Function to change the hostname
+change_hostname() {
+    sudo_cmd="/usr/bin/sudo"  # Define path to sudo command
+    scutil_cmd="/usr/sbin/scutil"  # Define path to scutil command
 
-# From which file do we get the informations
-source "$path"
+    # Set the new hostname for all three hostnames
+    $sudo_cmd $scutil_cmd --set ComputerName "$hostname"  # Set the computer name
+    $sudo_cmd $scutil_cmd --set HostName "$hostname"  # Set the host name
+    $sudo_cmd $scutil_cmd --set LocalHostName "$hostname"  # Set the local host name
 
-# Variables created in the textfile "5_user_information.txt"
-accountname="$FIRSTNAME$SURNAME"
-fullname="$FIRSTNAME $SURNAME"
-pw="$PASSWORD"
+    echo "Hostname changed successfully to $hostname"  # Print success message
+}
 
-# Check if variables are empty
-check_empty "$FIRSTNAME" "FIRSTNAME"
-check_empty "$SURNAME" "SURNAME"
-check_empty "$PASSWORD" "PASSWORD"
+# Verbose output of variables for verification
+echo "Accountname: $accountname"
+echo "Fullname: $fullname"
+echo "Password: $pw"
+echo "Password Hint: $passwordhint"
+echo "Hostname: $hostname"
 
-# Convert/Replace special characters and diacritics for the account name
-accountname=$(convert_accountname "$accountname")
+# User confirms the information
+echo "Are your informations correct? (y/n): "
+read -r answer
 
-# Convert/Replace special characters and diacritics for the full name
-fullname=$(convert_fullname "$fullname")
-
-# Test command to check the output from converted variables
-echo "$accountname"
-echo "$fullname"
-echo "$pw"
-
-# Ask the user if their entered user information in "5_user_information.txt" is correct
-read -p "Are your informations correct? (y/n) : " answer;
+# Convert input to lowercase
+answer=$(echo "$answer" | /usr/bin/tr '[:upper:]' '[:lower:]')
 
 # If the user types y (Yes) in the terminal, it continues the script
-# If the user types n (No) in the terminal, it stops automatically the script with *fi (Is set at the end of the script)
-if [ "$answer" == "y" ]; then
+# If the user types n (No) in the terminal, it stops automatically the script
+if [ "$answer" = "y" ]; then
     create_user
+    change_hostname
 fi
