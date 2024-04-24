@@ -4,7 +4,7 @@ macOS-Automation-Scripts
 This year 2023, I have successfully completed my secondary education as a computer scientist specializing in systems engineering. :)
 
 During my internship, I wrote automation scripts for macOS.
-## 2024: Today, these scripts are still in the editing phase and are constantly being improved
+### 2024: Today, these scripts are still in the editing phase and are constantly being improved
 My goal is to be able to share my "simple" scripts and maybe even help further. Since I know how time-consuming it can be to create a script.
 Perhaps these also serve as auxiliary material to be developed even better.
 
@@ -21,6 +21,10 @@ The scripts are intended to be used in conjunction with the iMazing software to 
 
 Note that the iMazing profiles are mentioned in the individual explanations, but it is not explained how to configure/create them.
 The focus here is on the scripts.
+
+## Why .command and not .sh
+This is for this simple reason, so that the scripts are executed immediately only by double-clicking. 
+Normally .sh scripts still have to be adapted so that the terminal executes the scripts.
 
 There are five different scripts:
 As usual, everything is commented out and explained in the script files, but I would like to briefly mention again what they are for;
