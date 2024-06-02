@@ -50,7 +50,7 @@ accountname=$(convert_accountname "${FIRSTNAME:0:1}${SURNAME}")
 fullname=$(convert_fullname "$FIRSTNAME $SURNAME")
 pw="$PASSWORD"
 passwordhint="$PASSWORDHINT"
-hostname="DONE-$HOSTNAME"
+hostname="XYZ-$HOSTNAME"
 
 # Check if variables for user and hostname are empty
 check_empty "$FIRSTNAME" "FIRSTNAME"
